@@ -26,12 +26,12 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  ConfettiController _controllerCenterLeft;
+  ConfettiController _controller;
 
   @override
   void initState() {
-    _controllerCenterLeft =
-        ConfettiController(duration: const Duration(seconds: 1));
+    _controller = ConfettiController(duration: const Duration(seconds: 1));
+
     super.initState();
   }
 
@@ -44,48 +44,34 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
-        const Align(
-          alignment: Alignment.topCenter,
-          child: MathWidget(),
-        ),
         Align(
-          alignment: Alignment.center,
-          child: ConfettiWidget(
-            confettiController: _controllerCenterLeft,
-            shouldLoop: true,
-            blastDirectionality: BlastDirectionality.explosive,
-            blastDirection: -pi / 2,
-
-            emissionFrequency: 0.1,
-            particleDrag: 0.05,
-            minimumSize: const Size(
-              10,
-              10,
-            ), // set the minimum potential size for the confetti (width, height)
-            maximumSize: const Size(
-              50,
-              50,
-            ), // set the maximum potential size for the confetti (width, height)
-            numberOfParticles: 1,
-            gravity: 0.1,
+          alignment: Alignment.topCenter,
+          child: MathWidget(
+            confettiController: _controller,
           ),
         ),
         Align(
           alignment: Alignment.center,
-          child: FlatButton(
-              onPressed: () {
-                _controllerCenterLeft.play();
-              },
-              child: _display('singles')),
+          child: ConfettiWidget(
+            confettiController: _controller,
+            emissionFrequency: 1,
+            numberOfParticles: 5,
+            maxBlastForce: 2,
+            minBlastForce: 1,
+            blastDirectionality: BlastDirectionality.directional,
+            blastDirection: -pi / 2,
+            gravity: 0.05,
+            shouldLoop: false,
+            displayTarget: false,
+            colors: null,
+            minimumSize: const Size(20, 10),
+            maximumSize: const Size(30, 15),
+            particleDrag: 0.05,
+            canvas: MediaQuery.of(context).size,
+            child: null,
+          ),
         ),
       ],
-    );
-  }
-
-  Text _display(String text) {
-    return Text(
-      text,
-      style: const TextStyle(color: Colors.white, fontSize: 20),
     );
   }
 }
