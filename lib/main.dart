@@ -26,11 +26,12 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  ConfettiController _controller;
+  ConfettiController _confettiController;
 
   @override
   void initState() {
-    _controller = ConfettiController(duration: const Duration(seconds: 1));
+    _confettiController =
+        ConfettiController(duration: const Duration(seconds: 1));
 
     super.initState();
   }
@@ -47,13 +48,13 @@ class _MyAppState extends State<MyApp> {
         Align(
           alignment: Alignment.topCenter,
           child: MathWidget(
-            confettiController: _controller,
+            confettiController: _confettiController,
           ),
         ),
         Align(
           alignment: Alignment.center,
           child: ConfettiWidget(
-            confettiController: _controller,
+            confettiController: _confettiController,
             emissionFrequency: 1,
             numberOfParticles: 5,
             maxBlastForce: 2,

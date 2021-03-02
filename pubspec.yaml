@@ -12,6 +12,7 @@ dependencies:
 
   cupertino_icons: ^0.1.2
   confetti: 0.5.4+1
+  circular_countdown_timer: ^0.1.0
    
 
 dev_dependencies:
