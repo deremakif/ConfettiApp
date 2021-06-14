@@ -1,10 +1,13 @@
 import 'dart:math';
 
+import 'package:confetti_app/models/ResultModel.dart';
+import 'package:confetti_app/providers/ResultListProvider.dart';
 import 'package:confetti_app/widgets/LevelListWidget.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
+import 'package:provider/provider.dart';
 
 class MathWidget extends StatefulWidget {
   const MathWidget({
@@ -26,8 +29,8 @@ class _MathWidgetState extends State<MathWidget> {
   final processList = ['+', '-', 'x', '÷'];
   String selectedProcess = '+';
 
-  double firstNumber = 10;
-  double secondNumber = 10;
+  int firstNumber = 10;
+  int secondNumber = 10;
 
   String errorMessage = '';
 
@@ -35,8 +38,13 @@ class _MathWidgetState extends State<MathWidget> {
   bool isStarted = false;
   String resultAsString = '';
 
+  ResultListProvider resultListProvider;
+
   @override
   void initState() {
+    resultListProvider =
+        Provider.of<ResultListProvider>(context, listen: false);
+
     super.initState();
 
     //setScreen(selectedLevel);
@@ -46,6 +54,7 @@ class _MathWidgetState extends State<MathWidget> {
   void dispose() {
     // Clean up the controller when the widget is disposed.
     responseController.dispose();
+    countDownController.pause();
 
     super.dispose();
   }
@@ -55,11 +64,11 @@ class _MathWidgetState extends State<MathWidget> {
     var response = responseController.text;
 
     if (selectedProcess == '+') {
-      result = firstNumber + secondNumber;
+      result = double.parse((firstNumber + secondNumber).toString());
     } else if (selectedProcess == '-') {
-      result = firstNumber - secondNumber;
+      result = double.parse((firstNumber - secondNumber).toString());
     } else if (selectedProcess == 'x') {
-      result = firstNumber * secondNumber;
+      result = double.parse((firstNumber * secondNumber).toString());
     } else if (selectedProcess == '÷') {
       result = firstNumber / secondNumber;
     }
@@ -84,11 +93,28 @@ class _MathWidgetState extends State<MathWidget> {
       resultAsString += '.00';
     }
 
-    if (resultAsString == response) {
-      return true;
-    }
+    final ResultModel resultModel = ResultModel();
+    resultModel.firstNumber = firstNumber;
+    resultModel.secondNumber = secondNumber;
+    resultModel.selectedProcess = selectedProcess;
+    resultModel.correctAnswer = resultAsString;
+    resultModel.response = response;
 
-    return false;
+    if (resultAsString == response) {
+      resultModel.isCorrect = true;
+      addResultToList(resultModel);
+
+      return true;
+    } else {
+      resultModel.isCorrect = false;
+
+      addResultToList(resultModel);
+      return false;
+    }
+  }
+
+  dynamic addResultToList(ResultModel resultModel) {
+    resultListProvider.addResultList(resultModel);
   }
 
   void checkResponse() {
@@ -171,25 +197,25 @@ class _MathWidgetState extends State<MathWidget> {
     });
   }
 
-  double getNumber(int i) {
-    double number = 1;
+  int getNumber(int i) {
+    int number = 1;
     if (i == 0) {
-      number = Random().nextInt(10).toDouble();
+      number = Random().nextInt(10);
     } else if (i == 1) {
-      number = Random().nextInt(100).toDouble();
+      number = Random().nextInt(100);
     } else if (i == 2) {
-      number = Random().nextInt(1000).toDouble();
+      number = Random().nextInt(1000);
     }
     return number;
   }
 
-  double analyzeLevel(int i, double number) {
+  int analyzeLevel(int i, int number) {
     if (i == 1 && number < 10) {
       number += 10;
     } else if (i == 2 && number < 100) {
       number += 100;
     }
-    return number;
+    return int.parse(number.toString());
   }
 
   void cleanResponse() {
@@ -450,6 +476,13 @@ class _MathWidgetState extends State<MathWidget> {
                           child: TextButton(
                             onPressed: () {
                               // Navigate
+                              countDownController.pause();
+                              setState(() {
+                                isStarted = false;
+                              });
+
+                              print('navigate');
+                              Navigator.pushNamed(context, '/result-list-page');
                             },
                             child: const Center(
                               child: Text(

@@ -1,13 +1,14 @@
+import 'package:confetti_app/models/ResultModel.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class ResultListProvider with ChangeNotifier {
-  int _count = 0;
+  final List<ResultModel> _resultList = [];
 
-  int get count => _count;
+  List<ResultModel> get getResultList => _resultList;
 
-  void increment() {
-    _count++;
+  void addResultList(ResultModel model) {
+    _resultList.add(model);
     notifyListeners();
   }
 }
