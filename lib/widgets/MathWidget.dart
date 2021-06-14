@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:ConfettiApp/widgets/LevelListWidget.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
@@ -31,6 +33,8 @@ class _MathWidgetState extends State<MathWidget> {
 
   int selectedLevel = 1;
   bool isStarted = false;
+  String resultAsString = '';
+
   @override
   void initState() {
     super.initState();
@@ -44,6 +48,84 @@ class _MathWidgetState extends State<MathWidget> {
     responseController.dispose();
 
     super.dispose();
+  }
+
+  bool checkResult() {
+    double result = 0;
+    var response = responseController.text;
+
+    if (selectedProcess == '+') {
+      result = firstNumber + secondNumber;
+    } else if (selectedProcess == '-') {
+      result = firstNumber - secondNumber;
+    } else if (selectedProcess == 'x') {
+      result = firstNumber * secondNumber;
+    } else if (selectedProcess == '÷') {
+      result = firstNumber / secondNumber;
+    }
+
+    resultAsString = result.toStringAsFixed(2);
+
+    if (response != null && response.contains(',')) {
+      response = response.replaceAll(',', '.');
+    } else if (response != null && response.contains('.')) {
+      // resultAsString = resultAsString.replaceAll('.0', '.00');
+    } else {
+      response += '.00';
+    }
+
+    if (resultAsString != null && resultAsString.endsWith('.0')) {
+      resultAsString = resultAsString.replaceAll('.0', '.00');
+    } else if (resultAsString != null && resultAsString.endsWith('.00')) {
+      // resultAsString = resultAsString.replaceAll('.0', '.00');
+    } else if (resultAsString != null && resultAsString.contains('.')) {
+      // resultAsString = resultAsString.replaceAll('.0', '.00');
+    } else {
+      resultAsString += '.00';
+    }
+
+    if (resultAsString == response) {
+      return true;
+    }
+
+    return false;
+  }
+
+  void checkResponse() {
+    countDownController.pause();
+    if (checkResult()) {
+      widget.confettiController.play();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Congrats!',
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+
+      addDuration();
+      setScreen(selectedLevel);
+    } else {
+      // return error!
+      setState(() {
+        errorMessage = 'Try again!';
+      });
+
+      AwesomeDialog(
+          context: context,
+          dialogType: DialogType.ERROR,
+          animType: AnimType.RIGHSLIDE,
+          headerAnimationLoop: true,
+          title: 'Error',
+          desc: 'Result: ' + resultAsString,
+          btnOkOnPress: () {
+            setScreen(selectedLevel);
+          },
+          btnOkIcon: Icons.cancel,
+          btnOkColor: Colors.purple[300])
+        ..show();
+    }
   }
 
   void setScreen(int i) {
@@ -141,10 +223,10 @@ class _MathWidgetState extends State<MathWidget> {
   List<InkWell> createLevelList() {
     // ignore: prefer_final_locals
     var inkWellList = <InkWell>[];
-    final list = ['Easy', 'Medium', 'Hard'];
-    print(list);
+    final levelList = ['Easy', 'Medium', 'Hard'];
+    print(levelList);
 
-    list.asMap().forEach((index, value) {
+    levelList.asMap().forEach((index, value) {
       final inkWell = InkWell(
         onTap: () {
           setSelectedLevel(index);
@@ -153,7 +235,7 @@ class _MathWidgetState extends State<MathWidget> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
                 colors: selectedLevel == index
-                    ? [Colors.blue, Colors.blue[100]]
+                    ? [Colors.purple[300], Colors.white]
                     : [Colors.white, Colors.white]),
             borderRadius: BorderRadius.circular(50),
           ),
@@ -162,6 +244,10 @@ class _MathWidgetState extends State<MathWidget> {
             child: Text(
               value,
               textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
@@ -184,86 +270,13 @@ class _MathWidgetState extends State<MathWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: Container(
-                  alignment: Alignment.centerRight,
-                  child: CircularCountDownTimer(
-                    // Countdown duration in Seconds.
-                    duration: duration,
-
-                    // Countdown initial elapsed Duration in Seconds.
-                    initialDuration: 0,
-
-                    // Controls (i.e Start, Pause, Resume, Restart) the Countdown Timer.
-                    controller: countDownController,
-
-                    // Width of the Countdown Widget.
-                    width: MediaQuery.of(context).size.width / 8,
-
-                    // Height of the Countdown Widget.
-                    height: MediaQuery.of(context).size.height / 8,
-
-                    // Ring Color for Countdown Widget.
-                    ringColor: Colors.grey[300],
-
-                    // Ring Gradient for Countdown Widget.
-                    ringGradient: null,
-
-                    // Filling Color for Countdown Widget.
-                    fillColor: Colors.purpleAccent[100],
-
-                    // Filling Gradient for Countdown Widget.
-                    fillGradient: null,
-
-                    // Background Color for Countdown Widget.
-                    backgroundColor: Colors.purple[500],
-
-                    // Background Gradient for Countdown Widget.
-                    backgroundGradient: null,
-
-                    // Border Thickness of the Countdown Ring.
-                    strokeWidth: 8.0,
-
-                    // Begin and end contours with a flat edge and no extension.
-                    strokeCap: StrokeCap.round,
-
-                    // Text Style for Countdown Text.
-                    textStyle: const TextStyle(
-                      fontSize: 20.0,
-                      color: Colors.white,
-                      // fontWeight: FontWeight.bold,
-                    ),
-
-                    // Format for the Countdown Text.
-                    textFormat: CountdownTextFormat.S,
-
-                    // Handles Countdown Timer (true for Reverse Countdown (max to 0), false for Forward Countdown (0 to max)).
-                    isReverse: true,
-
-                    // Handles Animation Direction (true for Reverse Animation, false for Forward Animation).
-                    isReverseAnimation: false,
-
-                    // Handles visibility of the Countdown Text.
-                    isTimerTextShown: true,
-
-                    // Handles the timer start.
-                    autoStart: false,
-
-                    // This Callback will execute when the Countdown Starts.
-                    onStart: () {
-                      // Here, do whatever you want
-                      print('Countdown Started');
-                    },
-
-                    // This Callback will execute when the Countdown Ends.
-                    onComplete: () {
-                      // Here, do whatever you want
-                      print('Countdown Ended');
-                      setScreen(selectedLevel);
-                    },
-                  ),
-                ),
+              LevelListWidget(
+                duration: duration,
+                countDownController: countDownController,
+                selectedLevel: selectedLevel,
+                onComplete: () {
+                  checkResponse();
+                },
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(
@@ -290,6 +303,10 @@ class _MathWidgetState extends State<MathWidget> {
                             child: Text(
                               firstNumber.toStringAsFixed(0).toString(),
                               textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
@@ -302,6 +319,10 @@ class _MathWidgetState extends State<MathWidget> {
                             child: Text(
                               secondNumber.toStringAsFixed(0).toString(),
                               textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
@@ -319,7 +340,8 @@ class _MathWidgetState extends State<MathWidget> {
                                   textAlign: TextAlign.end,
                                   style: const TextStyle(
                                     // decoration: TextDecoration.underline,
-                                    fontSize: 16,
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 const Text(
@@ -358,30 +380,16 @@ class _MathWidgetState extends State<MathWidget> {
                             horizontal: 16,
                           ),
                           child: ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(Colors.purple[300]),
+                            ),
                             onPressed: () {
                               // Validate returns true if the form is valid, or false
                               // otherwise.
                               if (_formKey.currentState.validate()) {
                                 // If the form is valid, display a Snackbar.
-                                if (checkResult()) {
-                                  widget.confettiController.play();
-                                  Scaffold.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        'Congrats!',
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                  );
-
-                                  addDuration();
-                                  setScreen(selectedLevel);
-                                } else {
-                                  // return error!
-                                  setState(() {
-                                    errorMessage = 'Try again!';
-                                  });
-                                }
+                                checkResponse();
                               }
                             },
                             child: const Center(
@@ -426,21 +434,45 @@ class _MathWidgetState extends State<MathWidget> {
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       // decoration: TextDecoration.underline,
-                                      fontSize: 12,
+                                      fontSize: 14,
                                     ),
                                   ),
                                 )
                               : Container(),
-                        )
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 36.0,
+                            horizontal: 6,
+                          ),
+                          child: TextButton(
+                            onPressed: () {
+                              // Navigate
+                            },
+                            child: const Center(
+                              child: Text(
+                                'Result List',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     )
                   : Container(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
-                          vertical: 16.0,
+                          vertical: 66.0,
                           horizontal: 16,
                         ),
                         child: ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all(Colors.purple[300]),
+                          ),
                           onPressed: () {
                             setState(() {
                               isStarted = true;
@@ -460,46 +492,5 @@ class _MathWidgetState extends State<MathWidget> {
         ),
       ),
     );
-  }
-
-  bool checkResult() {
-    double result = 0;
-    var response = responseController.text;
-
-    if (selectedProcess == '+') {
-      result = firstNumber + secondNumber;
-    } else if (selectedProcess == '-') {
-      result = firstNumber - secondNumber;
-    } else if (selectedProcess == 'x') {
-      result = firstNumber * secondNumber;
-    } else if (selectedProcess == '÷') {
-      result = firstNumber / secondNumber;
-    }
-
-    String resultAsString = result.toStringAsFixed(2);
-
-    if (response != null && response.contains(',')) {
-      response = response.replaceAll(',', '.');
-    } else if (response != null && response.contains('.')) {
-      // resultAsString = resultAsString.replaceAll('.0', '.00');
-    } else {
-      response += '.00';
-    }
-
-    if (resultAsString != null && resultAsString.endsWith('.0')) {
-      resultAsString = resultAsString.replaceAll('.0', '.00');
-    } else if (resultAsString != null && resultAsString.endsWith('.00')) {
-      // resultAsString = resultAsString.replaceAll('.0', '.00');
-    } else if (resultAsString != null && resultAsString.contains('.')) {
-      // resultAsString = resultAsString.replaceAll('.0', '.00');
-    } else {
-      resultAsString += '.00';
-    }
-
-    if (resultAsString == response) {
-      return true;
-    }
-
-    return false;
   }
 }
