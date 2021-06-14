@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:ConfettiApp/widgets/MathWidget.dart';
+import 'package:confetti_app/widgets/MathWidget.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 
@@ -10,7 +10,7 @@ class ExamPage extends StatefulWidget {
 }
 
 class _ExamPageState extends State<ExamPage> {
-  ConfettiController _confettiController;
+  ConfettiController _confettiController = ConfettiController();
 
   @override
   void initState() {
@@ -27,36 +27,38 @@ class _ExamPageState extends State<ExamPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        Align(
-          alignment: Alignment.topCenter,
-          child: MathWidget(
-            confettiController: _confettiController,
+    return Scaffold(
+      body: Stack(
+        children: <Widget>[
+          Align(
+            alignment: Alignment.topCenter,
+            child: MathWidget(
+              confettiController: _confettiController,
+            ),
           ),
-        ),
-        Align(
-          alignment: Alignment.center,
-          child: ConfettiWidget(
-            confettiController: _confettiController,
-            emissionFrequency: 1,
-            numberOfParticles: 5,
-            maxBlastForce: 2,
-            minBlastForce: 1,
-            blastDirectionality: BlastDirectionality.directional,
-            blastDirection: -pi / 2,
-            gravity: 0.05,
-            shouldLoop: false,
-            displayTarget: false,
-            colors: null,
-            minimumSize: const Size(20, 10),
-            maximumSize: const Size(30, 15),
-            particleDrag: 0.05,
-            canvas: MediaQuery.of(context).size,
-            child: null,
+          Align(
+            alignment: Alignment.center,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              emissionFrequency: 1,
+              numberOfParticles: 5,
+              maxBlastForce: 2,
+              minBlastForce: 1,
+              blastDirectionality: BlastDirectionality.directional,
+              blastDirection: -pi / 2,
+              gravity: 0.05,
+              shouldLoop: false,
+              displayTarget: false,
+              colors: null,
+              minimumSize: const Size(20, 10),
+              maximumSize: const Size(30, 15),
+              particleDrag: 0.05,
+              canvas: MediaQuery.of(context).size,
+              child: null,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -1,4 +1,4 @@
-name: ConfettiApp
+name: confetti_app
 description: A new Flutter project.
 
 version: 1.0.0+1
@@ -12,6 +12,8 @@ dependencies:
   confetti: 0.6.0-nullsafety
   flutter:
     sdk: flutter
+  provider: ^5.0.0
+
   
 
    

@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:ConfettiApp/widgets/LevelListWidget.dart';
+import 'package:confetti_app/widgets/LevelListWidget.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
@@ -208,9 +208,6 @@ class _MathWidgetState extends State<MathWidget> {
   }
 
   void setSelectedLevel(int i) {
-    setState(() {
-      selectedLevel = i;
-    });
     setScreen(i);
   }
 
@@ -229,7 +226,12 @@ class _MathWidgetState extends State<MathWidget> {
     levelList.asMap().forEach((index, value) {
       final inkWell = InkWell(
         onTap: () {
-          setSelectedLevel(index);
+          setState(() {
+            selectedLevel = index;
+          });
+          if (isStarted) {
+            setSelectedLevel(index);
+          }
         },
         child: Container(
           decoration: BoxDecoration(

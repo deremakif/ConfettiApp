@@ -1,4 +1,4 @@
-import 'package:ConfettiApp/widgets/CircularCountDownTimerWidget.dart';
+import 'package:confetti_app/widgets/CircularCountDownTimerWidget.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:flutter/material.dart';
 
